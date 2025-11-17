@@ -1,0 +1,44 @@
+{% load static %}
+{% if user.is_authenticated %}
+<div class="d-flex justify-content-center align-items-center" style="margin-top: 1rem; margin-bottom: 1rem;">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Add a Comment</h5>
+      <form id="comment-compose-form" method="post" data-post-id="{{ post.id }}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <textarea class="form-control" name="comment" rows="3" placeholder="Write your comment..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Comment</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="d-flex justify-content-center align-items-center" style="margin-top: 1rem; margin-bottom: 1rem;">
+  <div class="alert alert-info mt-3" role="alert">
+    Please <a href="{% url 'login' %}">log in</a> to comment on this listing.
+  </div>
+</div>
+{% endif %}
+
+<hr>
+
+<h5>{{ total_comments }} Comment{{ total_comments|pluralize }}</h5>
+
+<div class="comments-box">
+  {% for comment in comments %}
+    <div class="mb-2 comment">
+      <img 
+          src="https://ui-avatars.com/api/?name={{ comment.user.username }}&size=35&background=e52b50&color=ffffff" 
+          class="rounded-circle me-2" 
+          alt="Avatar">
+      <a class="profile-anchor" href="{% url 'profile' comment.user.id %}"><strong>@{{ comment.user.username }}</strong></a>
+      <small class="text-muted">{{ comment.commented_at }}</small>
+      <p>{{ comment.body }}</p>
+    </div>
+  {% empty %}
+    <p>No comments yet.</p>
+  {% endfor %}
+</div>
+

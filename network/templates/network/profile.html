@@ -1,0 +1,108 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block header %}
+    {% if not user == profile_user and user.is_authenticated %}
+        <script src="{% static 'network/follow.js' %}"></script>
+    {% endif %}
+{% endblock %}
+
+
+{% block body %}
+
+{% if ERROR %}
+    <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
+        <div class="card text-center shadow-sm p-4">
+            <img 
+                src="{% static 'network/no_posts.png' %}" 
+                alt="No Posts" 
+                class="mx-auto mb-3" 
+                style="max-height: 200px; width: auto; object-fit: scale-down;">
+            <div class="card-body">
+            <h5 class="card-title text-muted mb-0">User Not Found</h5>
+            </div>
+        </div>
+    </div>
+{% else %}
+
+<div class="container mt-4">
+  <div class="profile-info">
+    <div class="profile-header">
+      <img 
+        src="https://ui-avatars.com/api/?name={{ profile_user.username }}&background=e52b50&color=ffffff" 
+        class="profile-img" 
+        alt="Avatar">
+    </div>
+    <div class="profile-body">
+    <div class="profile-info-wrapper">
+        <h5><span><strong>Posts: </strong></span>{{ post_count }}</h5>
+        <h5 id="followers_cnt"><span><strong>Followers: </strong></span>{{ follower_count }}</h5>
+        <h5><span><strong>Following: </strong></span>{{ following_count }}</h5>
+      </div>
+      <h3 class="mb-1">{{ profile_user.username }}</h3>
+      <p class="text-muted mb-2">Joined: {{ profile_user.date_joined }}</p>
+      <p class="mb-3"><strong>Email:</strong> {{ profile_user.email }}</p>
+      {% if not user == profile_user and user.is_authenticated %}
+        <div id="profile-follow">
+            <form id="profile-follow-form">
+                {% csrf_token %}
+                <div class="d-flex gap-2">
+                    <button id="follow-button" class="btn btn-primary" type="submit" data-user-id="{{ profile_user.id }}">Follow</button>
+                </div>
+            </form>
+        </div>
+        <div id="profile-unfollow">
+            <form id="profile-unfollow-form">
+                {% csrf_token %}
+                <div class="d-flex gap-2">
+                    <button id="unfollow-button" class="btn btn-secondary" type="submit" data-user-id="{{ profile_user.id }}">Unfollow</button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+    </div>
+  </div>
+</div>
+    {% if posts %}
+    <hr class="mx-auto my-3" style="width:50%;">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for post in posts %}
+            <div class="col">
+            <a href="{% url 'view_post' post.id %}" class="text-decoration-none text-dark">
+                <div class="card profile-post-body h-100">
+                    {% if post.image %}
+                        <div class="image-container">
+                            <img 
+                                src="{{ post.image.url }}" 
+                                alt="{{ post.title }}">
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Posted: {{ post.created }}</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
+            <div class="card text-center shadow-sm p-4">
+                <img 
+                    src="{% static 'network/no_posts.png' %}" 
+                    alt="No Posts" 
+                    class="mx-auto mb-3" 
+                    style="max-height: 200px; width: auto; object-fit: scale-down;">
+                <div class="card-body">
+                <h5 class="card-title text-muted mb-0">No Posts Yet</h5>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endif %}
+
+{% endblock %}
